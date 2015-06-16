@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "util.h"
 #include "program.h"
 
 int main() {
@@ -10,7 +11,7 @@ int main() {
   const int success = load_program(p, "./programs/swap.tis");
 
   if (!success) {
-    fprintf(stderr, "ERROR");
+    raise_error("ERROR LOADING FILE");
   }
 
   free_program(&p);
