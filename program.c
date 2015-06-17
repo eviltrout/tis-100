@@ -11,7 +11,7 @@ Program *create_program(void) {
 
   Node *n = p->nodes;
   for (int i=0; i<PROGRAM_NODES; i++, ++n) {
-    n->number = i;
+    init_node(n, i);
   }
   return p;
 }
@@ -38,6 +38,11 @@ int load_program(const Program *p, const char *filename) {
         node_parse_instruction(n, line);
       }
     }
+  }
+
+  n = p->nodes;
+  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+    node_output(n);
   }
 
   fclose(fp);
