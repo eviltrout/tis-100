@@ -14,6 +14,8 @@ int main() {
     raise_error("ERROR LOADING FILE");
   }
 
+  tick_program(p);
+
   free_program(&p);
   assert(!p);
 }

@@ -9,16 +9,20 @@
 void init_node(Node *n, int number) {
   n->number = number;
   n->instruction_count = 0;
+  n->ip = 0;
 }
 
 void location_output(LocationType type, Location loc) {
   if (type == ADDRESS) {
     switch(loc) {
+      case NIL:   printf("NIL"); break;
       case UP:    printf("UP"); break;
       case DOWN:  printf("DOWN"); break;
       case LEFT:  printf("LEFT"); break;
       case RIGHT: printf("RIGHT"); break;
       case ACC:   printf("ACC"); break;
+      case ANY:   printf("ANY"); break;
+      case LAST:  printf("LAST"); break;
     }
   } else {
     printf("%d", loc);
@@ -26,7 +30,7 @@ void location_output(LocationType type, Location loc) {
 }
 
 void node_output(const Node *n) {
-  printf("[Node #%d count=%d]\n", n->number, n->instruction_count);
+  printf("[Node #%d count=%d ip=%d]\n", n->number, n->instruction_count, n->ip);
 
   for (int j=0; j<n->instruction_count; j++) {
     Instruction i = n->instructions[j];
@@ -52,6 +56,12 @@ void node_output(const Node *n) {
         break;
       case SWP:
         printf("SWP");
+        break;
+      case NEG:
+        printf("NEG");
+        break;
+      case NOP:
+        printf("NOP");
         break;
       default:
         printf("dunno about %d", i.operation);
@@ -85,6 +95,15 @@ void parse_location(const char *s, Location *loc, LocationType *type) {
   } else if (strcmp(s, "ACC") == 0) {
     *type = ADDRESS;
     *loc = ACC;
+  } else if (strcmp(s, "NIL") == 0) {
+    *type = ADDRESS;
+    *loc = NIL;
+  } else if (strcmp(s, "ANY") == 0) {
+    *type = ADDRESS;
+    *loc = ANY;
+  } else if (strcmp(s, "LAST") == 0) {
+    *type = ADDRESS;
+    *loc = LAST;
   } else {
     *type = LITERAL;
     *loc = atoi(s);
@@ -98,7 +117,7 @@ void parse_mov(Node *n, const char *s) {
 
   Instruction *i = node_create_instruction(n, MOV);
   parse_location(strtok(rem, " ,"), &i->src, &i->src_type);
-  parse_location(strtok(rem, " ,\n"), &i->dest, &i->dest_type);
+  parse_location(strtok(NULL, " ,\n"), &i->dest, &i->dest_type);
 
   free(rem);
 }
@@ -132,6 +151,10 @@ void node_parse_instruction(Node *n, const char *s) {
     node_create_instruction(n, SAV);
   } else if (strcmp(ins, "SWP") == 0) {
     node_create_instruction(n, SWP);
+  } else if (strcmp(ins, "NOP") == 0) {
+    node_create_instruction(n, NOP);
+  } else if (strcmp(ins, "NEG") == 0) {
+    node_create_instruction(n, NEG);
   } else {
     raise_error("Don't understand instruction [%s]", ins);
   }

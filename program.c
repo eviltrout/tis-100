@@ -16,6 +16,12 @@ Program *create_program(void) {
   return p;
 }
 
+void tick_program(Program *p) {
+  Node *n = p->nodes;
+  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+  }
+}
+
 int load_program(const Program *p, const char *filename) {
   assert(filename);
   assert(p);

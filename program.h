@@ -11,6 +11,7 @@ typedef struct _Program {
 
 Program *create_program(void);
 int load_program(const Program *p, const char *filename);
+void tick_program(Program *p);
 void free_program(Program ** pp);
 
 #endif

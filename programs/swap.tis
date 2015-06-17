@@ -20,7 +20,7 @@ MOV UP, DOWN
 MOV UP, DOWN
 
 @7
-
+NEG
 
 @8
 MOV UP, ACC

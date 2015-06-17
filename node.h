@@ -8,7 +8,9 @@ typedef enum {
   SAV,
   SWP,
   SUB,
-  ADD
+  ADD,
+  NOP,
+  NEG
 } Operation;
 
 typedef enum {
@@ -17,11 +19,14 @@ typedef enum {
 } LocationType;
 
 typedef enum {
+  NIL,
   UP,
   RIGHT,
   DOWN,
   LEFT,
-  ACC
+  ACC,
+  ANY,
+  LAST
 } Location;
 
 typedef struct _Instruction {
@@ -34,6 +39,7 @@ typedef struct _Instruction {
 } Instruction;
 
 typedef struct _Node {
+  int ip;
   int number;
   int instruction_count;
   Instruction instructions[MAX_INSTRUCTIONS];
