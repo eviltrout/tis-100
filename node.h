@@ -10,12 +10,18 @@ typedef enum {
   SUB,
   ADD,
   NOP,
-  NEG
+  NEG,
+  JEZ,
+  JMP,
+  JNZ,
+  JGZ,
+  JLZ,
+  JRO
 } Operation;
 
 typedef enum {
-  LITERAL,
-  ADDRESS
+  NUMBER,
+  ADDRESS,
 } LocationType;
 
 typedef enum {
@@ -41,6 +47,10 @@ typedef struct _Instruction {
 typedef struct _InputCode {
   int line_count;
   char * lines[MAX_INSTRUCTIONS];
+
+  int label_count;
+  char * labels[MAX_INSTRUCTIONS];
+  int label_address[MAX_INSTRUCTIONS];
 } InputCode;
 
 typedef struct _Node {
@@ -57,5 +67,6 @@ void free_input_code(InputCode *ic);
 void init_node(Node *n, int number);
 void node_output(const Node *n);
 void node_parse_code(Node *n, InputCode *ic);
+void node_parse_line(Node *n, InputCode *ic, const char *line);
 
 #endif
