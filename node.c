@@ -12,9 +12,9 @@ void init_node(Node *n, int number) {
   n->ip = 0;
 }
 
-void location_output(LocationType type, Location loc) {
+void location_output(LocationType type, union Location loc) {
   if (type == ADDRESS) {
-    switch(loc) {
+    switch(loc.direction) {
       case NIL:   printf("NIL"); break;
       case UP:    printf("UP"); break;
       case DOWN:  printf("DOWN"); break;
@@ -24,8 +24,8 @@ void location_output(LocationType type, Location loc) {
       case ANY:   printf("ANY"); break;
       case LAST:  printf("LAST"); break;
     }
-  } else {
-    printf("%d", loc);
+  } else if (type == NUMBER) {
+    printf("%d", loc.number);
   }
 }
 
@@ -101,36 +101,36 @@ Instruction *node_create_instruction(Node *n, Operation op) {
   return i;
 }
 
-void parse_location(const char *s, Location *loc, LocationType *type) {
+void parse_location(const char *s, union Location *loc, LocationType *type) {
   if (!s) { raise_error("no source was found"); }
 
   if (strcmp(s, "UP") == 0) {
     *type = ADDRESS;
-    *loc = UP;
+    (*loc).direction = UP;
   } else if (strcmp(s, "DOWN") == 0) {
     *type = ADDRESS;
-    *loc = DOWN;
+    (*loc).direction = DOWN;
   } else if (strcmp(s, "LEFT") == 0) {
     *type = ADDRESS;
-    *loc = LEFT;
+    (*loc).direction = LEFT;
   } else if (strcmp(s, "RIGHT") == 0) {
     *type = ADDRESS;
-    *loc = RIGHT;
+    (*loc).direction = RIGHT;
   } else if (strcmp(s, "ACC") == 0) {
     *type = ADDRESS;
-    *loc = ACC;
+    (*loc).direction = ACC;
   } else if (strcmp(s, "NIL") == 0) {
     *type = ADDRESS;
-    *loc = NIL;
+    (*loc).direction = NIL;
   } else if (strcmp(s, "ANY") == 0) {
     *type = ADDRESS;
-    *loc = ANY;
+    (*loc).direction = ANY;
   } else if (strcmp(s, "LAST") == 0) {
     *type = ADDRESS;
-    *loc = LAST;
+    (*loc).direction = LAST;
   } else {
     *type = NUMBER;
-    *loc = atoi(s);
+    (*loc).number = atoi(s);
   }
 }
 
@@ -163,7 +163,7 @@ void parse_onearg(Node *n, InputCode *ic, const char *s, Operation op) {
         const char *label = ic->labels[i];
         if (strcmp(label, rem) == 0) {
           ins->src_type = NUMBER;
-          ins->src = ic->label_address[i];
+          ins->src.number = ic->label_address[i];
           goto finally;
         }
       }

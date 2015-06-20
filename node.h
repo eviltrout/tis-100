@@ -33,30 +33,35 @@ typedef enum {
   ACC,
   ANY,
   LAST
-} Location;
+} LocationDirection;
+
+union Location {
+  signed short number;
+  LocationDirection direction;
+} _Location;
 
 typedef struct _Instruction {
   Operation operation;
   LocationType src_type;
-  Location src;
+  union Location src;
 
   LocationType dest_type;
-  Location dest;
+  union Location dest;
 } Instruction;
 
 typedef struct _InputCode {
-  int line_count;
+  unsigned char line_count;
   char * lines[MAX_INSTRUCTIONS];
 
-  int label_count;
+  unsigned char label_count;
   char * labels[MAX_INSTRUCTIONS];
-  int label_address[MAX_INSTRUCTIONS];
+  unsigned char label_address[MAX_INSTRUCTIONS];
 } InputCode;
 
 typedef struct _Node {
-  int ip;
-  int number;
-  int instruction_count;
+  unsigned char ip;
+  unsigned char number;
+  unsigned char instruction_count;
   Instruction instructions[MAX_INSTRUCTIONS];
 } Node;
 
