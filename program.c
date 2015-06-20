@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "program.h"
+#include "util.h"
 
 Program *create_program(void) {
   Program *p = (Program *) malloc(sizeof(Program));
@@ -36,14 +37,27 @@ int load_program(const Program *p, const char *filename) {
   ssize_t read;
 
   Node *n = NULL;
-  while ((read = getline(&line, &len, fp)) != -1) {
-    if (strlen(line) > 1) {
+
+  InputCode all_input[PROGRAM_NODES];
+  for (int i=0; i<PROGRAM_NODES; i++) {
+    init_input_code(&all_input[i]);
+  }
+
+  for (int index = 0; (read = getline(&line, &len, fp)) != -1;) {
+    char *trimmed = trim_whitespace(line);
+    if (strlen(trimmed) > 0) {
       if (line[0] == '@') {
-        n = &p->nodes[atoi(line+1)];
+        index = atoi(trimmed+1);
       } else {
-        node_parse_instruction(n, line);
+        input_code_addline(&all_input[index], trimmed);
       }
     }
+  }
+
+  n = p->nodes;
+  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+    node_parse_code(n, &all_input[i]);
+    free_input_code(&all_input[i]);
   }
 
   n = p->nodes;

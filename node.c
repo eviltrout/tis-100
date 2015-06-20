@@ -133,6 +133,76 @@ void parse_onearg(Node *n, const char *s, Operation op) {
   free(rem);
 }
 
+void node_parse_code(Node *n, InputCode *ic) {
+  int num_labels = 0;
+  char *labels[MAX_INSTRUCTIONS];
+  int label_address[MAX_INSTRUCTIONS];
+
+  // First let's find the labels
+  for (int i=0; i< ic->line_count; i++) {
+    char *line = ic->lines[i];
+
+    // Look for a label
+    char *c = line;
+    while (*c != '\0') {
+      if (*c == ':') {
+        int length = (c - line);
+        char *label = (char *) malloc(sizeof(char) * (length + 1));
+        strncpy(label, line, length);
+        label[length] = '\0';
+
+        int idx = num_labels;
+        labels[idx] = label;
+        label_address[idx] = i;
+        num_labels++;
+
+        // Remove the label from the code
+        char *rem = trim_whitespace(c+1);
+
+        // We need something to jump to, so NOP for now
+        // TODO: compress empty lines and jump to the next instruction
+        if (strlen(rem) == 0) { rem = "NOP"; }
+
+        char *new_line = (char *) malloc(sizeof(char) * strlen(rem));
+        strcpy(new_line, rem);
+
+        free(line);
+        line = new_line;
+        ic->lines[i] = new_line;
+      }
+      c++;
+    }
+  }
+
+  for (int i=0; i< ic->line_count; i++) {
+    char *line = ic->lines[i];
+    printf("%d -> [%d]: %s\n", n->number, i, line);
+  }
+
+  for (int i=0; i<num_labels; i++) {
+    free(labels[i]);
+  }
+  if (ic->line_count) {
+    printf("\n");
+  }
+}
+
+void init_input_code(InputCode *ic) {
+  ic->line_count = 0;
+}
+
+void input_code_addline(InputCode *ic, const char *line) {
+  char *copy = malloc(sizeof(char) * strlen(line));
+  strcpy(copy, line);
+  ic->lines[ic->line_count++] = copy;
+}
+
+void free_input_code(InputCode *ic) {
+  for (int i=0; i<ic->line_count; i++) {
+    free(ic->lines[i]);
+  }
+}
+
 void node_parse_instruction(Node *n, const char *s) {
   assert(n);
   assert(s);

@@ -38,6 +38,11 @@ typedef struct _Instruction {
   Location dest;
 } Instruction;
 
+typedef struct _InputCode {
+  int line_count;
+  char * lines[MAX_INSTRUCTIONS];
+} InputCode;
+
 typedef struct _Node {
   int ip;
   int number;
@@ -45,8 +50,12 @@ typedef struct _Node {
   Instruction instructions[MAX_INSTRUCTIONS];
 } Node;
 
+void init_input_code(InputCode *ic);
+void input_code_addline(InputCode *ic, const char *line);
+void free_input_code(InputCode *ic);
+
 void init_node(Node *n, int number);
 void node_output(const Node *n);
-void node_parse_instruction(Node *n, const char *s);
+void node_parse_code(Node *n, InputCode *ic);
 
 #endif
