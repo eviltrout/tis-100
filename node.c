@@ -164,11 +164,13 @@ void parse_onearg(Node *n, InputCode *ic, const char *s, Operation op) {
         if (strcmp(label, rem) == 0) {
           ins->src_type = NUMBER;
           ins->src = ic->label_address[i];
+          goto finally;
         }
       }
     default:
       parse_location(rem, &ins->src, &ins->src_type);
   }
+finally:
   free(rem);
 }
 

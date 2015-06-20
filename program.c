@@ -44,7 +44,20 @@ int load_program(const Program *p, const char *filename) {
   }
 
   for (int index = 0; (read = getline(&line, &len, fp)) != -1;) {
+
+    // ignore after comment, ignore debug
+    char *c = line;
+    while (*c != '\0') {
+      if (*c == '#') {
+        *c = '\0';
+        break;
+      } else if (*c == '!') {
+        *c = ' ';
+      }
+      c++;
+    }
     char *trimmed = trim_whitespace(line);
+
     if (strlen(trimmed) > 0) {
       if (line[0] == '@') {
         index = atoi(trimmed+1);
