@@ -3,33 +3,33 @@
 #include <assert.h>
 #include <string.h>
 
+#include "constants.h"
+#include "input_code.h"
 #include "program.h"
 #include "util.h"
 
-Program *create_program(void) {
-  Program *p = (Program *) malloc(sizeof(Program));
+void program_init(Program * p) {
   p->nodes = (Node *) malloc(sizeof(Node) * PROGRAM_NODES);
 
   Node *n = p->nodes;
   for (int i=0; i<PROGRAM_NODES; i++, ++n) {
-    init_node(n, i);
+    node_init(n, i);
   }
-  return p;
 }
 
-void tick_program(Program *p) {
+void program_tick(const Program *p) {
   Node *n = p->nodes;
   for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+    node_tick(n);
   }
 }
 
-int load_program(const Program *p, const char *filename) {
+void program_load(const Program *p, const char *filename) {
   assert(filename);
-  assert(p);
 
   FILE *fp = fopen(filename, "r");
   if (fp == NULL) {
-    return 0;
+    raise_error("Couldn't load file");
   }
 
   char * line = NULL;
@@ -40,7 +40,7 @@ int load_program(const Program *p, const char *filename) {
 
   InputCode all_input[PROGRAM_NODES];
   for (int i=0; i<PROGRAM_NODES; i++) {
-    init_input_code(&all_input[i]);
+    input_code_init(&all_input[i]);
   }
 
   for (int index = 0; (read = getline(&line, &len, fp)) != -1;) {
@@ -70,24 +70,21 @@ int load_program(const Program *p, const char *filename) {
   n = p->nodes;
   for (int i=0; i<PROGRAM_NODES; i++, ++n) {
     node_parse_code(n, &all_input[i]);
-    free_input_code(&all_input[i]);
-  }
-
-  n = p->nodes;
-  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
-    node_output(n);
+    input_code_clean(&all_input[i]);
   }
 
   fclose(fp);
   if (line) { free(line); }
-
-  return 1;
 }
 
-void free_program(Program ** pp) {
-  Program *p = *pp;
+void program_output(const Program * p) {
+  Node *n = p->nodes;
+  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+    node_output(n);
+  }
+}
+
+void program_clean(Program * p) {
   free(p->nodes);
-  free(p);
-  *pp = NULL;
 }
 

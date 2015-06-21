@@ -6,16 +6,13 @@
 #include "program.h"
 
 int main() {
-  Program *p = create_program();
-  assert(p);
-  const int success = load_program(p, "./programs/divide.tis");
+  Program program;
+  Program *p = &program;
 
-  if (!success) {
-    raise_error("ERROR LOADING FILE");
-  }
+  program_init(p);
+  program_load(p, "./programs/divide.tis");
+  program_tick(p);
+  program_output(p);
 
-  tick_program(p);
-
-  free_program(&p);
-  assert(!p);
+  program_clean(p);
 }

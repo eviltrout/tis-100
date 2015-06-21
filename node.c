@@ -6,7 +6,7 @@
 #include "util.h"
 #include "node.h"
 
-void init_node(Node *n, int number) {
+void node_init(Node *n, int number) {
   n->number = number;
   n->instruction_count = 0;
   n->ip = 0;
@@ -217,26 +217,6 @@ void node_parse_code(Node *n, InputCode *ic) {
   }
 }
 
-void init_input_code(InputCode *ic) {
-  ic->line_count = 0;
-  ic->label_count = 0;
-}
-
-void input_code_addline(InputCode *ic, const char *line) {
-  char *copy = malloc(sizeof(char) * strlen(line));
-  strcpy(copy, line);
-  ic->lines[ic->line_count++] = copy;
-}
-
-void free_input_code(InputCode *ic) {
-  for (int i=0; i<ic->line_count; i++) {
-    free(ic->lines[i]);
-  }
-  for (int i=0; i<ic->label_count; i++) {
-    free(ic->labels[i]);
-  }
-}
-
 void node_parse_line(Node *n, InputCode *ic, const char *s) {
   assert(n);
   assert(s);
@@ -274,4 +254,8 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
   } else {
     raise_error("Don't understand instruction [%s]", ins);
   }
+}
+
+void node_tick(Node *n) {
+  
 }

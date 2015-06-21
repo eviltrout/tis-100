@@ -1,7 +1,8 @@
 #ifndef _NODE_H
 #define _NODE_H
 
-#define MAX_INSTRUCTIONS 15
+#include "constants.h"
+#include "input_code.h"
 
 typedef enum {
   MOV,
@@ -49,15 +50,6 @@ typedef struct _Instruction {
   union Location dest;
 } Instruction;
 
-typedef struct _InputCode {
-  unsigned char line_count;
-  char * lines[MAX_INSTRUCTIONS];
-
-  unsigned char label_count;
-  char * labels[MAX_INSTRUCTIONS];
-  unsigned char label_address[MAX_INSTRUCTIONS];
-} InputCode;
-
 typedef struct _Node {
   unsigned char ip;
   unsigned char number;
@@ -65,13 +57,10 @@ typedef struct _Node {
   Instruction instructions[MAX_INSTRUCTIONS];
 } Node;
 
-void init_input_code(InputCode *ic);
-void input_code_addline(InputCode *ic, const char *line);
-void free_input_code(InputCode *ic);
-
-void init_node(Node *n, int number);
+void node_init(Node *n, int number);
 void node_output(const Node *n);
 void node_parse_code(Node *n, InputCode *ic);
 void node_parse_line(Node *n, InputCode *ic, const char *line);
+void node_tick(Node *n);
 
 #endif
