@@ -11,8 +11,9 @@ int main() {
 
   program_init(p);
   program_load(p, "./programs/divide.tis");
-  program_tick(p);
-  program_output(p);
 
-  program_clean(p);
+  program_output(p);
+  printf("------------------------------------------------------\n");
+  /* program_tick(p); */
+  /* program_output(p); */
 }

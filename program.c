@@ -8,23 +8,26 @@
 #include "program.h"
 #include "util.h"
 
-void program_init(Program * p) {
-  p->nodes = (Node *) malloc(sizeof(Node) * PROGRAM_NODES);
+#define for_each_active(n, p) \
+        Node *(n); for(int i=0; (n)=p->active_nodes[i], i < p->active_node_count; i++)
 
-  Node *n = p->nodes;
-  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+#define for_each_node(n, p) \
+        Node *(n) = p->nodes; for(int i=0; i < PROGRAM_NODES; i++, ++n)
+
+void program_init(Program * p) {
+  p->active_node_count = 0;
+  for_each_node(n, p) {
     node_init(n, i);
   }
 }
 
 void program_tick(const Program *p) {
-  Node *n = p->nodes;
-  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+  for_each_active(n, p) {
     node_tick(n);
   }
 }
 
-void program_load(const Program *p, const char *filename) {
+void program_load(Program *p, const char *filename) {
   assert(filename);
 
   FILE *fp = fopen(filename, "r");
@@ -35,8 +38,6 @@ void program_load(const Program *p, const char *filename) {
   char * line = NULL;
   size_t len = 0;
   ssize_t read;
-
-  Node *n = NULL;
 
   InputCode all_input[PROGRAM_NODES];
   for (int i=0; i<PROGRAM_NODES; i++) {
@@ -67,10 +68,13 @@ void program_load(const Program *p, const char *filename) {
     }
   }
 
-  n = p->nodes;
-  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+  for_each_node(n, p) {
     node_parse_code(n, &all_input[i]);
     input_code_clean(&all_input[i]);
+
+    if (n->instruction_count > 0) {
+      p->active_nodes[p->active_node_count++] = n;
+    }
   }
 
   fclose(fp);
@@ -78,13 +82,7 @@ void program_load(const Program *p, const char *filename) {
 }
 
 void program_output(const Program * p) {
-  Node *n = p->nodes;
-  for (int i=0; i<PROGRAM_NODES; i++, ++n) {
+  for_each_active(n, p) {
     node_output(n);
   }
 }
-
-void program_clean(Program * p) {
-  free(p->nodes);
-}
-
