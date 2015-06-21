@@ -3,5 +3,7 @@
 
 #define MAX_INSTRUCTIONS 15
 #define PROGRAM_NODES 12
+#define MAX_ACC 999
+#define MIN_ACC -999
 
 #endif

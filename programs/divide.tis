@@ -1,5 +1,5 @@
 @0
-MOV 0 ACC
+MOV 10 ACC
 SAV
 
 L:
@@ -58,6 +58,13 @@ ADD LEFT
 MOV ACC DOWN
 
 @6
+MOV 10 ACC
+SWP
+MOV 1 ACC
+SWP
+NOP
+
+X: NOP
 
 
 @7

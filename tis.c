@@ -12,8 +12,15 @@ int main() {
   program_init(p);
   program_load(p, "./programs/divide.tis");
 
-  program_output(p);
+  Node *n = &p->nodes[6];
+  node_output(n);
   printf("------------------------------------------------------\n");
-  /* program_tick(p); */
+  node_tick(n);
+  node_output(n);
+  printf("------------------------------------------------------\n");
+  node_tick(n);
+  node_output(n);
+  printf("------------------------------------------------------\n");
+
   /* program_output(p); */
 }

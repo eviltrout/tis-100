@@ -37,7 +37,7 @@ typedef enum {
 } LocationDirection;
 
 union Location {
-  signed short number;
+  short number;
   LocationDirection direction;
 } _Location;
 
@@ -55,6 +55,9 @@ typedef struct _Node {
   unsigned char number;
   unsigned char instruction_count;
   Instruction instructions[MAX_INSTRUCTIONS];
+
+  short acc;
+  short bak;
 } Node;
 
 void node_init(Node *n, int number);

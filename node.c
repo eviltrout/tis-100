@@ -10,6 +10,8 @@ void node_init(Node *n, int number) {
   n->number = number;
   n->instruction_count = 0;
   n->ip = 0;
+  n->acc = 0;
+  n->bak = 0;
 }
 
 void location_output(LocationType type, union Location loc) {
@@ -30,12 +32,17 @@ void location_output(LocationType type, union Location loc) {
 }
 
 void node_output(const Node *n) {
-  printf("[Node #%d count=%d ip=%d]\n", n->number, n->instruction_count, n->ip);
+  printf("[Node #%d acc=%d bak=%d]\n", n->number, n->acc, n->bak);
 
   for (int j=0; j<n->instruction_count; j++) {
     Instruction i = n->instructions[j];
 
-    printf("  [%d] ", j);
+    if (j == n->ip) {
+      printf("-->");
+    } else {
+      printf("   ");
+    }
+    printf(" [%X] ", j);
     switch(i.operation) {
       case MOV:
         printf("MOV ");
@@ -256,6 +263,69 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
   }
 }
 
+static inline void node_set_ip(Node *n, short new_val) {
+  if (new_val > n->instruction_count || new_val < 0) new_val = 0;
+  n->ip = new_val;
+}
+
 void node_tick(Node *n) {
-  
+  Instruction *i = &n->instructions[n->ip];
+  short tmp;
+  switch(i->operation) {
+    case MOV:
+      if (i->src_type == NUMBER) {
+        if (i->dest_type == ADDRESS && i->dest.direction == ACC) {
+          n->acc = i->src.number;
+        }
+      }
+      break;
+    case ADD:
+      n->acc += i->src.number;
+      if (n->acc > MAX_ACC) n->acc = MAX_ACC;
+      if (n->acc < MIN_ACC) n->acc = MIN_ACC;
+      break;
+    case SUB:
+      n->acc -= i->src.number;
+      if (n->acc > MAX_ACC) n->acc = MAX_ACC;
+      if (n->acc < MIN_ACC) n->acc = MIN_ACC;
+      break;
+    case JMP: node_set_ip(n, i->src.number); return;
+    case JRO: node_set_ip(n, n->ip + i->src.number); return;
+    case JEZ:
+      if (n->acc == 0) {
+        node_set_ip(n, i->src.number);
+        return;
+      }
+      break;
+    case JGZ:
+      if (n->acc > 0) {
+        node_set_ip(n, i->src.number);
+        return;
+      }
+      break;
+    case JLZ:
+      if (n->acc < 0) {
+        node_set_ip(n, i->src.number);
+        return;
+      }
+      break;
+    case JNZ:
+      if (n->acc != 0) {
+        node_set_ip(n, i->src.number);
+        return;
+      }
+      break;
+    case SWP:
+      tmp = n->bak;
+      n->bak = n->acc;
+      n->acc = tmp;
+      break;
+    case SAV: n->bak = n->acc; break;
+    case NEG: n->acc = n->acc * -1; break;
+    case NOP: break;
+    default:
+      printf("ERROR: DIDN'T HANDLE op\n");
+  }
+
+  node_set_ip(n, n->ip+1);
 }
