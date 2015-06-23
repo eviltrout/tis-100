@@ -279,6 +279,11 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
   if (type == NUMBER) {
     res.blocked = 0;
     res.value = where.number;
+  } else if (where.direction == NIL) {
+    res.value = 0;
+    res.blocked = 0;
+  } else {
+    raise_error("wat");
   }
 
   return res;
@@ -300,7 +305,6 @@ void node_tick(Node *n) {
     case MOV:
       read = node_read(n, i->src_type, i->src);
       if (read.blocked) return;
-
       node_write(n, i->dest.direction, read.value);
       break;
     case ADD:

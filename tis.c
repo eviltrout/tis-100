@@ -13,7 +13,7 @@ int main() {
   program_load_system(p, "./programs/divide.sys");
   program_load_code(p, "./programs/divide.tis");
 
-  Node *n = &p->nodes[6];
+  Node *n = &p->nodes[1];
   node_output(n);
   printf("------------------------------------------------------\n");
   node_tick(n);
