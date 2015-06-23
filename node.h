@@ -58,12 +58,25 @@ typedef struct _Node {
 
   short acc;
   short bak;
+
+  // Ports
+  struct _Node *up;
+  struct _Node *right;
+  struct _Node *down;
+  struct _Node *left;
 } Node;
+
+typedef struct _ReadResult {
+  int blocked;
+  short value;
+} ReadResult;
 
 void node_init(Node *n, int number);
 void node_output(const Node *n);
 void node_parse_code(Node *n, InputCode *ic);
 void node_parse_line(Node *n, InputCode *ic, const char *line);
 void node_tick(Node *n);
+ReadResult node_read(Node *n, LocationType lt, union Location where);
+void node_write(Node *n, LocationDirection dir, short value);
 
 #endif

@@ -10,7 +10,8 @@ int main() {
   Program *p = &program;
 
   program_init(p);
-  program_load(p, "./programs/divide.tis");
+  program_load_system(p, "./programs/divide.sys");
+  program_load_code(p, "./programs/divide.tis");
 
   Node *n = &p->nodes[6];
   node_output(n);

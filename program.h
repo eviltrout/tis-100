@@ -10,7 +10,8 @@ typedef struct _Program {
 } Program;
 
 void program_init(Program *p);
-void program_load(Program *p, const char *filename);
+void program_load_system(Program *p, const char *filename);
+void program_load_code(Program *p, const char *filename);
 void program_tick(const Program *p);
 void program_output(const Program *p);
 

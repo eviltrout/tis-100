@@ -19,6 +19,24 @@ void program_init(Program * p) {
   for_each_node(n, p) {
     node_init(n, i);
   }
+
+  // Link all the nodes up
+  Node *nodes = p->nodes;
+  for (int i=0; i<4; i++) {
+    if (i < 3) {
+      nodes[i].right = &nodes[i+1];
+      nodes[i+4].right = &nodes[i+5];
+      nodes[i+8].right = &nodes[i+9];
+      nodes[i+1].left = &nodes[i];
+      nodes[i+5].left = &nodes[i+4];
+      nodes[i+9].left = &nodes[i+8];
+    }
+    nodes[i].down = &nodes[i+4];
+    nodes[i+4].down = &nodes[i+8];
+    nodes[i+4].up = &nodes[i];
+    nodes[i+8].up = &nodes[i+4];
+  }
+
 }
 
 void program_tick(const Program *p) {
@@ -27,7 +45,11 @@ void program_tick(const Program *p) {
   }
 }
 
-void program_load(Program *p, const char *filename) {
+void program_load_system(Program *p, const char *filename) {
+  assert(filename);
+}
+
+void program_load_code(Program *p, const char *filename) {
   assert(filename);
 
   FILE *fp = fopen(filename, "r");

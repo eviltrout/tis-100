@@ -12,6 +12,10 @@ void node_init(Node *n, int number) {
   n->ip = 0;
   n->acc = 0;
   n->bak = 0;
+  n->left = NULL;
+  n->right = NULL;
+  n->up = NULL;
+  n->down = NULL;
 }
 
 void location_output(LocationType type, union Location loc) {
@@ -268,16 +272,36 @@ static inline void node_set_ip(Node *n, short new_val) {
   n->ip = new_val;
 }
 
+ReadResult node_read(Node *n, LocationType type, union Location where) {
+  ReadResult res;
+  res.blocked = 1;
+
+  if (type == NUMBER) {
+    res.blocked = 0;
+    res.value = where.number;
+  }
+
+  return res;
+}
+
+void node_write(Node *n, LocationDirection dir, short value) {
+  switch(dir) {
+    case ACC: n->acc = value; break;
+    default:
+      raise_error("don't know how to write %d", dir);
+  }
+}
+
 void node_tick(Node *n) {
   Instruction *i = &n->instructions[n->ip];
   short tmp;
+  ReadResult read;
   switch(i->operation) {
     case MOV:
-      if (i->src_type == NUMBER) {
-        if (i->dest_type == ADDRESS && i->dest.direction == ACC) {
-          n->acc = i->src.number;
-        }
-      }
+      read = node_read(n, i->src_type, i->src);
+      if (read.blocked) return;
+
+      node_write(n, i->dest.direction, read.value);
       break;
     case ADD:
       n->acc += i->src.number;
