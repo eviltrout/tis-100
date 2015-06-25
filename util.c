@@ -4,11 +4,14 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "util.h"
+#include <ncurses.h>
 
 void raise_error(const char *msg, ...) {
   va_list(args);
   va_start(args, msg);
+  endwin();
   vfprintf(stderr, msg, args);
+  fprintf(stderr, "\n");
   exit(0);
 }
 

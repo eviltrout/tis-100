@@ -7,7 +7,7 @@ run: tis
 	./tis
 
 tis: tis.c program.o node.o util.o input_code.o
-	$(CC) $(CFLAGS) -o tis tis.c program.o node.o util.o input_code.o
+	$(CC) $(CFLAGS) -o tis tis.c program.o node.o util.o input_code.o -lncurses
 
 program.o: program.c program.h node.h
 	$(CC) $(CFLAGS) -c program.c

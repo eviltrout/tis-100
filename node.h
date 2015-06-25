@@ -77,6 +77,6 @@ void node_parse_code(Node *n, InputCode *ic);
 void node_parse_line(Node *n, InputCode *ic, const char *line);
 void node_tick(Node *n);
 ReadResult node_read(Node *n, LocationType lt, union Location where);
-void node_write(Node *n, LocationDirection dir, short value);
+int node_write(Node *n, LocationDirection dir, short value);
 
 #endif

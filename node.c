@@ -21,87 +21,87 @@ void node_init(Node *n, int number) {
 void location_output(LocationType type, union Location loc) {
   if (type == ADDRESS) {
     switch(loc.direction) {
-      case NIL:   printf("NIL"); break;
-      case UP:    printf("UP"); break;
-      case DOWN:  printf("DOWN"); break;
-      case LEFT:  printf("LEFT"); break;
-      case RIGHT: printf("RIGHT"); break;
-      case ACC:   printf("ACC"); break;
-      case ANY:   printf("ANY"); break;
-      case LAST:  printf("LAST"); break;
+      case NIL:   printw("NIL"); break;
+      case UP:    printw("UP"); break;
+      case DOWN:  printw("DOWN"); break;
+      case LEFT:  printw("LEFT"); break;
+      case RIGHT: printw("RIGHT"); break;
+      case ACC:   printw("ACC"); break;
+      case ANY:   printw("ANY"); break;
+      case LAST:  printw("LAST"); break;
     }
   } else if (type == NUMBER) {
-    printf("%d", loc.number);
+    printw("%d", loc.number);
   }
 }
 
 void node_output(const Node *n) {
-  printf("[Node #%d acc=%d bak=%d]\n", n->number, n->acc, n->bak);
+  printw("[Node #%d acc=%d bak=%d]\n", n->number, n->acc, n->bak);
 
   for (int j=0; j<n->instruction_count; j++) {
     Instruction i = n->instructions[j];
 
     if (j == n->ip) {
-      printf("-->");
+      printw("-->");
     } else {
-      printf("   ");
+      printw("   ");
     }
-    printf(" [%X] ", j);
+    printw(" [%X] ", j);
     switch(i.operation) {
       case MOV:
-        printf("MOV ");
+        printw("MOV ");
         location_output(i.src_type, i.src);
-        printf(" ");
+        printw(" ");
         location_output(i.dest_type, i.dest);
         break;
       case ADD:
-        printf("ADD ");
+        printw("ADD ");
         location_output(i.src_type, i.src);
         break;
       case SUB:
-        printf("SUB ");
+        printw("SUB ");
         location_output(i.src_type, i.src);
         break;
       case JEZ:
-        printf("JEZ ");
+        printw("JEZ ");
         location_output(i.src_type, i.src);
         break;
       case JMP:
-        printf("JMP ");
+        printw("JMP ");
         location_output(i.src_type, i.src);
         break;
       case JNZ:
-        printf("JNZ ");
+        printw("JNZ ");
         location_output(i.src_type, i.src);
         break;
       case JGZ:
-        printf("JGZ ");
+        printw("JGZ ");
         location_output(i.src_type, i.src);
         break;
       case JLZ:
-        printf("JLZ ");
+        printw("JLZ ");
         location_output(i.src_type, i.src);
         break;
       case JRO:
-        printf("JRO ");
+        printw("JRO ");
         location_output(i.src_type, i.src);
         break;
       case SAV:
-        printf("SAV");
+        printw("SAV");
         break;
       case SWP:
-        printf("SWP");
+        printw("SWP");
         break;
       case NEG:
-        printf("NEG");
+        printw("NEG");
         break;
       case NOP:
-        printf("NOP");
+        printw("NOP");
         break;
       default:
-        printf("dunno about %d", i.operation);
+        printw("dunno about %d", i.operation);
     }
-    printf("\n");
+    printw("\n");
   }
 }
 
@@ -289,23 +289,30 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
   return res;
 }
 
-void node_write(Node *n, LocationDirection dir, short value) {
+int node_write(Node *n, LocationDirection dir, short value) {
   switch(dir) {
     case ACC: n->acc = value; break;
     default:
       raise_error("don't know how to write %d", dir);
   }
+
+  // not blocked
+  return 0;
 }
 
 void node_tick(Node *n) {
   Instruction *i = &n->instructions[n->ip];
   short tmp;
   ReadResult read;
+
+  int blocked;
+
   switch(i->operation) {
     case MOV:
       read = node_read(n, i->src_type, i->src);
       if (read.blocked) return;
-      node_write(n, i->dest.direction, read.value);
+      blocked = node_write(n, i->dest.direction, read.value);
+      if (blocked) return;
       break;
     case ADD:
       n->acc += i->src.number;
@@ -352,8 +359,9 @@ void node_tick(Node *n) {
     case NEG: n->acc = n->acc * -1; break;
     case NOP: break;
     default:
-      printf("ERROR: DIDN'T HANDLE op\n");
+      printw("ERROR: DIDN'T HANDLE op\n");
   }
+  refresh();			/* Print it on to the real screen */
 
   node_set_ip(n, n->ip+1);
 }
