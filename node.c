@@ -36,7 +36,7 @@ void location_output(LocationType type, union Location loc) {
 }
 
 void node_output(const Node *n) {
-  printw("[Node #%d acc=%d bak=%d]\n", n->number, n->acc, n->bak);
+  printw("[Node #%d acc=%d bak=%d ip=%d]\n", n->number, n->acc, n->bak, n->ip);
 
   for (int j=0; j<n->instruction_count; j++) {
     Instruction i = n->instructions[j];
@@ -268,7 +268,7 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
 }
 
 static inline void node_set_ip(Node *n, short new_val) {
-  if (new_val > n->instruction_count || new_val < 0) new_val = 0;
+  if (new_val >= n->instruction_count || new_val < 0) new_val = 0;
   n->ip = new_val;
 }
 

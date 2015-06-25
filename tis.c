@@ -22,8 +22,6 @@ int main() {
 	noecho();
 
   node_output(n);
-  node_tick(n);
-
   refresh();
   int code = getch();
   while (code != 'q') {
