@@ -26,11 +26,11 @@ typedef enum {
 } LocationType;
 
 typedef enum {
-  NIL,
   UP,
   RIGHT,
   DOWN,
   LEFT,
+  NIL,
   ACC,
   ANY,
   LAST
@@ -59,11 +59,10 @@ typedef struct _Node {
   short acc;
   short bak;
 
-  // Ports
-  struct _Node *up;
-  struct _Node *right;
-  struct _Node *down;
-  struct _Node *left;
+  struct _Node *output_port;
+  short output_value;
+
+  struct _Node *ports[4];
 } Node;
 
 typedef struct _ReadResult {
@@ -78,5 +77,6 @@ void node_parse_line(Node *n, InputCode *ic, const char *line);
 void node_tick(Node *n);
 ReadResult node_read(Node *n, LocationType lt, union Location where);
 int node_write(Node *n, LocationDirection dir, short value);
+void node_advance(Node *n);
 
 #endif

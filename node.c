@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ncurses.h>
 
 #include "util.h"
 #include "node.h"
@@ -12,10 +13,14 @@ void node_init(Node *n, int number) {
   n->ip = 0;
   n->acc = 0;
   n->bak = 0;
-  n->left = NULL;
-  n->right = NULL;
-  n->up = NULL;
-  n->down = NULL;
+
+  n->output_port = NULL;
+  n->output_value = 0;
+
+  n->ports[0] = NULL;
+  n->ports[1] = NULL;
+  n->ports[2] = NULL;
+  n->ports[3] = NULL;
 }
 
 void location_output(LocationType type, union Location loc) {
@@ -36,7 +41,7 @@ void location_output(LocationType type, union Location loc) {
 }
 
 void node_output(const Node *n) {
-  printw("[Node #%d acc=%d bak=%d ip=%d]\n", n->number, n->acc, n->bak, n->ip);
+  printw("[Node #%d acc=%d bak=%d ov=%d]\n", n->number, n->acc, n->bak, n->output_value);
 
   for (int j=0; j<n->instruction_count; j++) {
     Instruction i = n->instructions[j];
@@ -274,30 +279,68 @@ static inline void node_set_ip(Node *n, short new_val) {
 
 ReadResult node_read(Node *n, LocationType type, union Location where) {
   ReadResult res;
-  res.blocked = 1;
+  res.blocked = 0;
 
   if (type == NUMBER) {
-    res.blocked = 0;
     res.value = where.number;
-  } else if (where.direction == NIL) {
-    res.value = 0;
-    res.blocked = 0;
   } else {
-    raise_error("wat");
+    Node *dest;
+    switch (where.direction) {
+      case NIL:
+        res.value = 0;
+        break;
+      case ACC:
+        res.value = n->acc;
+        break;
+      case UP:
+      case RIGHT:
+      case DOWN:
+      case LEFT:
+        dest = n->ports[where.direction];
+        if (dest && dest->output_port == n) {
+          res.value = dest->output_value;
+          res.blocked = 0;
+
+          dest->output_value = 0;
+          dest->output_port = NULL;
+          node_advance(dest);
+        } else {
+          res.blocked = 1;
+        }
+        break;
+      default:
+        raise_error("unhandled direction");
+    }
   }
 
   return res;
 }
 
 int node_write(Node *n, LocationDirection dir, short value) {
+  Node *dest;
   switch(dir) {
     case ACC: n->acc = value; break;
+    case UP:
+    case RIGHT:
+    case DOWN:
+    case LEFT:
+      dest = n->ports[dir];
+      if (dest) {
+        n->output_port = dest;
+        n->output_value = value;
+      }
+      return 1;
+      break;
     default:
       raise_error("don't know how to write %d", dir);
   }
 
   // not blocked
   return 0;
+}
+
+void node_advance(Node *n) {
+  node_set_ip(n, n->ip+1);
 }
 
 void node_tick(Node *n) {
@@ -363,5 +406,5 @@ void node_tick(Node *n) {
   }
   refresh();			/* Print it on to the real screen */
 
-  node_set_ip(n, n->ip+1);
+  node_advance(n);
 }

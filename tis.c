@@ -12,23 +12,19 @@ int main() {
 
   program_init(p);
   program_load_system(p, "./programs/divide.sys");
-  program_load_code(p, "./programs/divide.tis");
-
-  Node *n = &p->nodes[6];
+  program_load_code(p, "./programs/move.tis");
 
   initscr();
 	raw();
 	keypad(stdscr, TRUE);
 	noecho();
 
-  node_output(n);
-  refresh();
+  program_output(p);
   int code = getch();
   while (code != 'q') {
-    node_tick(n);
+    program_tick(p);
     clear();
-    node_output(n);
-    refresh();
+    program_output(p);
     code = getch();
   }
 
