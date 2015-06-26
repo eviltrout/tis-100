@@ -331,6 +331,9 @@ int node_write(Node *n, LocationDirection dir, short value) {
       }
       return 1;
       break;
+    case ANY:
+    case NIL:
+      raise_error("Can't write to %d", dir);
     default:
       raise_error("don't know how to write %d", dir);
   }

@@ -12,7 +12,7 @@ int main() {
 
   program_init(p);
   program_load_system(p, "./programs/divide.sys");
-  program_load_code(p, "./programs/move.tis");
+  program_load_code(p, "./programs/divide.tis");
 
   initscr();
 	raw();
@@ -28,7 +28,5 @@ int main() {
     code = getch();
   }
 
-  endwin();			/* End curses mode		  */
-
-  /* program_output(p); */
+  endwin();
 }
