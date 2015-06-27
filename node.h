@@ -65,12 +65,17 @@ typedef struct _Node {
   struct _Node *ports[4];
 } Node;
 
+typedef struct _NodeList {
+  Node *node;
+  struct _NodeList *prev;
+} NodeList;
+
 typedef struct _ReadResult {
   int blocked;
   short value;
 } ReadResult;
 
-void node_init(Node *n, int number);
+void node_init(Node *n);
 void node_output(const Node *n);
 void node_parse_code(Node *n, InputCode *ic);
 void node_parse_line(Node *n, InputCode *ic, const char *line);
@@ -78,5 +83,6 @@ void node_tick(Node *n);
 ReadResult node_read(Node *n, LocationType lt, union Location where);
 int node_write(Node *n, LocationDirection dir, short value);
 void node_advance(Node *n);
+Instruction *node_create_instruction(Node *n, Operation op);
 
 #endif

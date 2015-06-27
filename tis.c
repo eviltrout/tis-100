@@ -10,14 +10,14 @@ int main() {
   Program program;
   Program *p = &program;
 
-  program_init(p);
-  program_load_system(p, "./programs/divide.sys");
-  program_load_code(p, "./programs/divide.tis");
-
   initscr();
 	raw();
 	keypad(stdscr, TRUE);
 	noecho();
+
+  program_init(p);
+  program_load_system(p, "./programs/divide.sys");
+  program_load_code(p, "./programs/divide.tis");
 
   program_output(p);
   int code = getch();
@@ -29,4 +29,5 @@ int main() {
   }
 
   endwin();
+  program_clean(p);
 }

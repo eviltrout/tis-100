@@ -7,8 +7,7 @@
 #include "util.h"
 #include "node.h"
 
-void node_init(Node *n, int number) {
-  n->number = number;
+void node_init(Node *n) {
   n->instruction_count = 0;
   n->ip = 0;
   n->acc = 0;
