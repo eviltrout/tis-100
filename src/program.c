@@ -18,12 +18,7 @@
 Node *create_node(Program *p) {
   Node *n = (Node *) malloc(sizeof(Node));
   node_init(n);
-
-  NodeList *head = (NodeList *) malloc(sizeof(NodeList));
-  head->node = n;
-  head->prev = p->extra_nodes;
-  p->extra_nodes = head;
-
+  p->extra_nodes = node_list_append(p->extra_nodes, n);
   return n;
 }
 
@@ -56,14 +51,7 @@ void program_init(Program * p) {
 }
 
 void program_clean(Program *p) {
-  NodeList *list = p->extra_nodes;
-  while (list) {
-    free(list->node);
-
-    NodeList *ref = list;
-    list = list->prev;
-    free(ref);
-  }
+  node_list_clean(p->extra_nodes, TRUE);
   p->extra_nodes = NULL;
 }
 

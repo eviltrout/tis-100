@@ -65,11 +65,6 @@ typedef struct _Node {
   struct _Node *ports[4];
 } Node;
 
-typedef struct _NodeList {
-  Node *node;
-  struct _NodeList *prev;
-} NodeList;
-
 typedef struct _ReadResult {
   int blocked;
   short value;
