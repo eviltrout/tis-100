@@ -164,9 +164,3 @@ void program_load_code(Program *p, const char *filename) {
   fclose(fp);
   if (line) { free(line); }
 }
-
-void program_output(const Program * p) {
-  for_each_list(l, p->active_nodes) {
-    node_output(l->node);
-  }
-}

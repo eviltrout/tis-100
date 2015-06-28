@@ -5,6 +5,7 @@
 
 #include "util.h"
 #include "program.h"
+#include "output.h"
 
 int main() {
   Program program;
@@ -19,12 +20,12 @@ int main() {
   program_load_system(p, "./programs/divide.sys");
   program_load_code(p, "./programs/divide.tis");
 
-  program_output(p);
+  output_program(p);
   int code = getch();
   while (code != 'q') {
     program_tick(p);
     clear();
-    program_output(p);
+    output_program(p);
     code = getch();
   }
 

@@ -2,7 +2,6 @@
 #include <assert.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ncurses.h>
 
 #include "util.h"
 #include "node.h"
@@ -22,92 +21,6 @@ void node_init(Node *n) {
   n->ports[3] = NULL;
 }
 
-void location_output(LocationType type, union Location loc) {
-  if (type == ADDRESS) {
-    switch(loc.direction) {
-      case NIL:   printw("NIL"); break;
-      case UP:    printw("UP"); break;
-      case DOWN:  printw("DOWN"); break;
-      case LEFT:  printw("LEFT"); break;
-      case RIGHT: printw("RIGHT"); break;
-      case ACC:   printw("ACC"); break;
-      case ANY:   printw("ANY"); break;
-      case LAST:  printw("LAST"); break;
-    }
-  } else if (type == NUMBER) {
-    printw("%d", loc.number);
-  }
-}
-
-void node_output(const Node *n) {
-  printw("[Node #%d acc=%d bak=%d ov=%d]\n", n->number, n->acc, n->bak, n->output_value);
-
-  for (int j=0; j<n->instruction_count; j++) {
-    Instruction i = n->instructions[j];
-
-    if (j == n->ip) {
-      printw("-->");
-    } else {
-      printw("   ");
-    }
-    printw(" [%X] ", j);
-    switch(i.operation) {
-      case MOV:
-        printw("MOV ");
-        location_output(i.src_type, i.src);
-        printw(" ");
-        location_output(i.dest_type, i.dest);
-        break;
-      case ADD:
-        printw("ADD ");
-        location_output(i.src_type, i.src);
-        break;
-      case SUB:
-        printw("SUB ");
-        location_output(i.src_type, i.src);
-        break;
-      case JEZ:
-        printw("JEZ ");
-        location_output(i.src_type, i.src);
-        break;
-      case JMP:
-        printw("JMP ");
-        location_output(i.src_type, i.src);
-        break;
-      case JNZ:
-        printw("JNZ ");
-        location_output(i.src_type, i.src);
-        break;
-      case JGZ:
-        printw("JGZ ");
-        location_output(i.src_type, i.src);
-        break;
-      case JLZ:
-        printw("JLZ ");
-        location_output(i.src_type, i.src);
-        break;
-      case JRO:
-        printw("JRO ");
-        location_output(i.src_type, i.src);
-        break;
-      case SAV:
-        printw("SAV");
-        break;
-      case SWP:
-        printw("SWP");
-        break;
-      case NEG:
-        printw("NEG");
-        break;
-      case NOP:
-        printw("NOP");
-        break;
-      default:
-        printw("dunno about %d", i.operation);
-    }
-    printw("\n");
-  }
-}
 
 Instruction *node_create_instruction(Node *n, Operation op) {
   assert(n->instruction_count < MAX_INSTRUCTIONS);
@@ -404,9 +317,7 @@ void node_tick(Node *n) {
     case NEG: n->acc = n->acc * -1; break;
     case NOP: break;
     default:
-      printw("ERROR: DIDN'T HANDLE op\n");
+      raise_error("ERROR: DIDN'T HANDLE op\n");
   }
-  refresh();			/* Print it on to the real screen */
-
   node_advance(n);
 }
