@@ -20,12 +20,12 @@ int main() {
   program_load_system(p, "./programs/divide.sys");
   program_load_code(p, "./programs/divide.tis");
 
+  nodelay(stdscr, TRUE);
+
   output_program(p);
-  int code = getch();
+  int code = -1;
   while (code != 'q') {
     program_tick(p);
-    clear();
-    output_program(p);
     code = getch();
   }
 

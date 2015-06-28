@@ -12,6 +12,8 @@ void node_init(Node *n) {
   n->acc = 0;
   n->bak = 0;
 
+  n->instructions = (Instruction *) malloc(sizeof(Instruction) * MAX_INSTRUCTIONS);
+
   n->output_port = NULL;
   n->output_value = 0;
 
@@ -21,6 +23,9 @@ void node_init(Node *n) {
   n->ports[3] = NULL;
 }
 
+void node_clean(Node *n) {
+  free(n->instructions);
+}
 
 Instruction *node_create_instruction(Node *n, Operation op) {
   assert(n->instruction_count < MAX_INSTRUCTIONS);
@@ -179,6 +184,8 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
     node_create_instruction(n, NOP);
   } else if (strcmp(ins, "NEG") == 0) {
     node_create_instruction(n, NEG);
+  } else if (strcmp(ins, "OUT") == 0) {
+    node_create_instruction(n, OUT);
   } else {
     raise_error("Don't understand instruction [%s]", ins);
   }
@@ -237,7 +244,7 @@ int node_write(Node *n, LocationDirection dir, short value) {
     case DOWN:
     case LEFT:
       dest = n->ports[dir];
-      if (dest) {
+      if (dest && n->output_port == NULL) {
         n->output_port = dest;
         n->output_value = value;
       }
@@ -273,12 +280,18 @@ void node_tick(Node *n) {
       if (blocked) return;
       break;
     case ADD:
-      n->acc += i->src.number;
+      read = node_read(n, i->src_type, i->src);
+      if (read.blocked) return;
+
+      n->acc += read.value;
       if (n->acc > MAX_ACC) n->acc = MAX_ACC;
       if (n->acc < MIN_ACC) n->acc = MIN_ACC;
       break;
     case SUB:
-      n->acc -= i->src.number;
+      read = node_read(n, i->src_type, i->src);
+      if (read.blocked) return;
+
+      n->acc -= read.value;
       if (n->acc > MAX_ACC) n->acc = MAX_ACC;
       if (n->acc < MIN_ACC) n->acc = MIN_ACC;
       break;
@@ -316,6 +329,9 @@ void node_tick(Node *n) {
     case SAV: n->bak = n->acc; break;
     case NEG: n->acc = n->acc * -1; break;
     case NOP: break;
+    case OUT:
+      printw("[%d] -> %d\n", n->number, n->acc);
+      break;
     default:
       raise_error("ERROR: DIDN'T HANDLE op\n");
   }

@@ -1,6 +1,7 @@
 #include "output.h"
 #include "node_list.h"
 #include <ncurses.h>
+#include "util.h"
 
 void output_node(const Node *n) {
   printw("[Node #%d acc=%d bak=%d ov=%d]\n", n->number, n->acc, n->bak, n->output_value);
@@ -65,8 +66,11 @@ void output_node(const Node *n) {
       case NOP:
         printw("NOP");
         break;
+      case OUT:
+        printw("OUT");
+        break;
       default:
-        printw("dunno about %d", i.operation);
+        raise_error("dunno about %d", i.operation);
     }
     printw("\n");
   }

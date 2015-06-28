@@ -88,6 +88,10 @@ Node *create_input_node(Program *p, FILE *fp) {
     line = read_line(fp, line);
   }
 
+  Instruction *i = node_create_instruction(n, JRO);
+  i->src_type = NUMBER;
+  i->src.number = 0;
+
   if (line) { free(line); }
   return n;
 }
@@ -102,7 +106,8 @@ void program_load_system(Program *p, const char *filename) {
   char * line = NULL;
   while ((line = read_line(fp, line))) {
     if (strncmp(line, "input-top", 9) == 0) {
-      create_input_node(p, fp);
+      Node *n = create_input_node(p, fp);
+      p->active_nodes = node_list_append(p->active_nodes, n);
     }
   }
   if (line) { free(line); }

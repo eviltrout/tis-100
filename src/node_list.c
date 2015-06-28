@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "node.h"
 #include "node_list.h"
 
 NodeList * node_list_append(NodeList *list, Node *n) {
@@ -18,7 +19,10 @@ NodeList * node_list_append(NodeList *list, Node *n) {
 
 void node_list_clean(NodeList *list, int free_nodes) {
   while (list) {
-    if (free_nodes) { free(list->node); }
+    if (free_nodes) {
+      node_clean(list->node);
+      free(list->node);
+    }
 
     NodeList *ref = list;
     list = list->next;

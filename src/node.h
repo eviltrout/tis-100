@@ -17,7 +17,8 @@ typedef enum {
   JNZ,
   JGZ,
   JLZ,
-  JRO
+  JRO,
+  OUT
 } Operation;
 
 typedef enum {
@@ -54,7 +55,7 @@ typedef struct _Node {
   unsigned char ip;
   unsigned char number;
   unsigned char instruction_count;
-  Instruction instructions[MAX_INSTRUCTIONS];
+  Instruction *instructions;
 
   short acc;
   short bak;
@@ -71,6 +72,8 @@ typedef struct _ReadResult {
 } ReadResult;
 
 void node_init(Node *n);
+void node_clean(Node *n);
+
 void node_parse_code(Node *n, InputCode *ic);
 void node_parse_line(Node *n, InputCode *ic, const char *line);
 void node_tick(Node *n);

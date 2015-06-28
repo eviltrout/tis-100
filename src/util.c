@@ -15,6 +15,17 @@ void raise_error(const char *msg, ...) {
   exit(0);
 }
 
+void custom_log(const char *msg, ...) {
+  va_list(args);
+  va_start(args, msg);
+  endwin();
+
+  FILE *fp = fopen("tis.log", "a");
+  vfprintf(fp, msg, args);
+  fprintf(fp, "\n");
+  fclose(fp);
+}
+
 char *trim_whitespace(char *str)
 {
   char *end;
