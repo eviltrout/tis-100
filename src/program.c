@@ -9,31 +9,25 @@
 #include "util.h"
 #include "curses.h"
 
-#define for_each_active(n, p) \
-        Node *(n); for(int i=0; (n)=p->active_nodes[i], i < p->active_node_count; i++)
-
-#define for_each_node(n, p) \
-        Node *(n); for(int i=0; (n)=p->nodes[i], i < PROGRAM_NODES; i++)
-
 Node *create_node(Program *p) {
   Node *n = (Node *) malloc(sizeof(Node));
   node_init(n);
-  p->extra_nodes = node_list_append(p->extra_nodes, n);
+  p->nodes = node_list_append(p->nodes, n);
   return n;
 }
 
 void program_init(Program * p) {
-  p->active_node_count = 0;
-  p->extra_nodes = NULL;
+  p->nodes = NULL;
+  p->active_nodes = NULL;
 
   for (int i=0; i<PROGRAM_NODES; i++) {
     Node *n = create_node(p);
     n->number = i;
-    p->nodes[i] = n;
+    p->nodes_by_index[i] = n;
   }
 
   // Link all the nodes up
-  Node **nodes = p->nodes;
+  Node **nodes = p->nodes_by_index;
   for (int i=0; i<4; i++) {
     if (i < 3) {
       nodes[i]->ports[RIGHT] = nodes[i+1];
@@ -51,13 +45,14 @@ void program_init(Program * p) {
 }
 
 void program_clean(Program *p) {
-  node_list_clean(p->extra_nodes, TRUE);
-  p->extra_nodes = NULL;
+  node_list_clean(p->active_nodes, FALSE);
+  node_list_clean(p->nodes, TRUE);
+  p->nodes = NULL;
 }
 
 void program_tick(const Program *p) {
-  for_each_active(n, p) {
-    node_tick(n);
+  for_each_list(l, p->active_nodes) {
+    node_tick(l->node);
   }
 }
 
@@ -78,7 +73,7 @@ Node *create_input_node(Program *p, FILE *fp) {
 
   char *line = NULL;
   line = read_line(fp, line);
-  Node *below = p->nodes[atoi(line)];
+  Node *below = p->nodes_by_index[atoi(line)];
 
   n->ports[DOWN] = below;
   below->ports[UP] = n;
@@ -92,8 +87,6 @@ Node *create_input_node(Program *p, FILE *fp) {
     i->dest.direction = DOWN;
     line = read_line(fp, line);
   }
-
-  node_output(n);
 
   if (line) { free(line); }
   return n;
@@ -109,7 +102,7 @@ void program_load_system(Program *p, const char *filename) {
   char * line = NULL;
   while ((line = read_line(fp, line))) {
     if (strncmp(line, "input-top", 9) == 0) {
-      Node *n = create_input_node(p, fp);
+      create_input_node(p, fp);
     }
   }
   if (line) { free(line); }
@@ -158,12 +151,13 @@ void program_load_code(Program *p, const char *filename) {
     }
   }
 
-  for_each_node(n, p) {
-    node_parse_code(n, &all_input[i]);
-    input_code_clean(&all_input[i]);
+  for (int i=0; i<PROGRAM_NODES; i++) {
+    Node *n = p->nodes_by_index[i];
+    node_parse_code(n, &all_input[n->number]);
+    input_code_clean(&all_input[n->number]);
 
     if (n->instruction_count > 0) {
-      p->active_nodes[p->active_node_count++] = n;
+      p->active_nodes = node_list_append(p->active_nodes, n);
     }
   }
 
@@ -172,7 +166,7 @@ void program_load_code(Program *p, const char *filename) {
 }
 
 void program_output(const Program * p) {
-  for_each_active(n, p) {
-    node_output(n);
+  for_each_list(l, p->active_nodes) {
+    node_output(l->node);
   }
 }

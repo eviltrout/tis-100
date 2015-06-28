@@ -5,11 +5,10 @@
 #include "node_list.h"
 
 typedef struct _Program {
-  unsigned char active_node_count;
-  Node * active_nodes[PROGRAM_NODES];
-  Node * nodes[PROGRAM_NODES];
+  Node * nodes_by_index[PROGRAM_NODES];
 
-  NodeList *extra_nodes;
+  NodeList *nodes;
+  NodeList *active_nodes;
 } Program;
 
 void program_init(Program *p);
