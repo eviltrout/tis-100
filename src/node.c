@@ -11,6 +11,7 @@ void node_init(Node *n) {
   n->ip = 0;
   n->acc = 0;
   n->bak = 0;
+  n->visible = FALSE;
 
   n->instructions = (Instruction *) malloc(sizeof(Instruction) * MAX_INSTRUCTIONS);
 

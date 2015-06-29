@@ -22,6 +22,7 @@ void program_init(Program * p) {
 
   for (int i=0; i<PROGRAM_NODES; i++) {
     Node *n = create_node(p);
+    n->visible = TRUE;
     n->number = i;
     p->nodes_by_index[i] = n;
   }

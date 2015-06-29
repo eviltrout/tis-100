@@ -6,4 +6,7 @@
 #define MAX_ACC 999
 #define MIN_ACC -999
 
+#define TRUE 1
+#define FALSE 0
+
 #endif

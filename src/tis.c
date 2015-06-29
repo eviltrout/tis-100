@@ -11,7 +11,7 @@ int main() {
   Program program;
   Program *p = &program;
 
-  initscr();
+  WINDOW * win =initscr();
 	raw();
 	keypad(stdscr, TRUE);
 	noecho();
@@ -20,12 +20,19 @@ int main() {
   program_load_system(p, "./programs/divide.sys");
   program_load_code(p, "./programs/divide.tis");
 
-  nodelay(stdscr, TRUE);
+  output_program(win, p);
+  /* nodelay(stdscr, TRUE); */
+  /* int code = -1; */
+  /* while (code != 'q') { */
+  /*   program_tick(p); */
+  /*   code = getch(); */
+  /* } */
 
-  output_program(p);
-  int code = -1;
+  int code = getch();
   while (code != 'q') {
     program_tick(p);
+    clear();
+    output_program(win, p);
     code = getch();
   }
 

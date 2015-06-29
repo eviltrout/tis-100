@@ -3,7 +3,7 @@
 #include <ncurses.h>
 #include "util.h"
 
-void output_node(const Node *n) {
+void output_node(WINDOW *win, const Node *n) {
   printw("[Node #%d acc=%d bak=%d ov=%d]\n", n->number, n->acc, n->bak, n->output_value);
 
   for (int j=0; j<n->instruction_count; j++) {
@@ -18,41 +18,41 @@ void output_node(const Node *n) {
     switch(i.operation) {
       case MOV:
         printw("MOV ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         printw(" ");
-        output_location(i.dest_type, i.dest);
+        output_location(win, i.dest_type, i.dest);
         break;
       case ADD:
         printw("ADD ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case SUB:
         printw("SUB ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JEZ:
         printw("JEZ ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JMP:
         printw("JMP ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JNZ:
         printw("JNZ ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JGZ:
         printw("JGZ ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JLZ:
         printw("JLZ ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case JRO:
         printw("JRO ");
-        output_location(i.src_type, i.src);
+        output_location(win, i.src_type, i.src);
         break;
       case SAV:
         printw("SAV");
@@ -76,7 +76,7 @@ void output_node(const Node *n) {
   }
 }
 
-void output_location(LocationType type, union Location loc) {
+void output_location(WINDOW *win, LocationType type, union Location loc) {
   if (type == ADDRESS) {
     switch(loc.direction) {
       case NIL:   printw("NIL"); break;
@@ -93,8 +93,11 @@ void output_location(LocationType type, union Location loc) {
   }
 }
 
-void output_program(const Program * p) {
+void output_program(WINDOW *win, const Program * p) {
   for_each_list(l, p->active_nodes) {
-    output_node(l->node);
+    Node *n = l->node;
+    if (n->visible) {
+      output_node(win, n);
+    }
   }
 }
