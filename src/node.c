@@ -36,7 +36,7 @@ Instruction *node_create_instruction(Node *n, Operation op) {
   return i;
 }
 
-void parse_location(const char *s, union Location *loc, LocationType *type) {
+static void parse_location(const char *s, union Location *loc, LocationType *type) {
   if (!s) { raise_error("no source was found"); }
 
   if (strcmp(s, "UP") == 0) {
@@ -69,7 +69,7 @@ void parse_location(const char *s, union Location *loc, LocationType *type) {
   }
 }
 
-void parse_mov(Node *n, const char *s) {
+static void parse_mov(Node *n, const char *s) {
   const int len = strlen(s+4);
   char *rem = (char *) malloc(sizeof(char) * len);
   strcpy(rem, s+4);
@@ -81,7 +81,7 @@ void parse_mov(Node *n, const char *s) {
   free(rem);
 }
 
-void parse_onearg(Node *n, InputCode *ic, const char *s, Operation op) {
+static void parse_onearg(Node *n, InputCode *ic, const char *s, Operation op) {
   const int len = strlen(s+4);
   char *rem = (char *) malloc(sizeof(char) * len);
   strcpy(rem, s+4);
@@ -159,6 +159,7 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
 
   char ins[5];
   strncpy(ins, s, 3);
+  ins[3] = '\0';
 
   if (strcmp(ins, "MOV") == 0) {
     parse_mov(n, s);

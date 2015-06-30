@@ -8,7 +8,7 @@
 #include "output.h"
 
 
-int main() {
+int main(int argc, char **argv) {
   Program program;
   Program *p = &program;
 

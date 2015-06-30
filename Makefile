@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-pedantic -Wall -pedantic-errors -Wundef -Wstrict-prototypes  -Wmissing-declarations
+CFLAGS=-std=c99 -pedantic -Wall -pedantic-errors -Wundef -Wstrict-prototypes  -Wmissing-declarations
 
 all: tis
 
@@ -7,7 +7,7 @@ run: tis
 	./tis
 
 tis: src/tis.c build/program.o build/node.o build/util.o build/input_code.o build/node_list.o build/output.o
-	$(CC) $(CFLAGS) -o tis src/tis.c build/program.o build/node.o build/util.o build/input_code.o build/node_list.o build/output.o -lncurses
+	$(CC) $(CFLAGS) -o tis src/tis.c build/program.o build/node.o build/util.o build/input_code.o build/node_list.o build/output.o -lncurses -lm
 
 build/program.o: src/program.c src/program.h src/node.h src/node_list.h
 	$(CC) $(CFLAGS) -c src/program.c -o build/program.o
