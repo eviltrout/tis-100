@@ -71,7 +71,7 @@ static void parse_location(const char *s, union Location *loc, LocationType *typ
 
 static void parse_mov(Node *n, const char *s) {
   const int len = strlen(s+4);
-  char *rem = (char *) malloc(sizeof(char) * len);
+  char *rem = (char *) malloc(sizeof(char) * (len + 1));
   strcpy(rem, s+4);
 
   Instruction *i = node_create_instruction(n, MOV);
@@ -83,7 +83,7 @@ static void parse_mov(Node *n, const char *s) {
 
 static void parse_onearg(Node *n, InputCode *ic, const char *s, Operation op) {
   const int len = strlen(s+4);
-  char *rem = (char *) malloc(sizeof(char) * len);
+  char *rem = (char *) malloc(sizeof(char) * (len + 1));
   strcpy(rem, s+4);
 
   Instruction *ins = node_create_instruction(n, op);
