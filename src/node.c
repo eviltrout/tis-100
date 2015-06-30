@@ -157,8 +157,9 @@ void node_parse_line(Node *n, InputCode *ic, const char *s) {
   assert(s);
   assert(strlen(s) > 2);
 
-  char ins[5];
+  char ins[4];
   strncpy(ins, s, 3);
+  ins[3] = '\0';
 
   if (strcmp(ins, "MOV") == 0) {
     parse_mov(n, s);
