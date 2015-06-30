@@ -53,6 +53,7 @@ typedef struct _Instruction {
 
 typedef struct _Node {
   unsigned visible:1;
+  unsigned blocked:1;
   unsigned char ip;
   unsigned char number;
   unsigned char instruction_count;

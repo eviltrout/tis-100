@@ -51,10 +51,14 @@ void program_clean(Program *p) {
   p->nodes = NULL;
 }
 
-void program_tick(const Program *p) {
+int program_tick(const Program *p) {
+  int all_blocked = TRUE;
   for_each_list(l, p->active_nodes) {
-    node_tick(l->node);
+    Node *n = l->node;
+    node_tick(n);
+    all_blocked &= n->blocked;
   }
+  return all_blocked;
 }
 
 char *read_line(FILE *fp, char *line) {
@@ -97,6 +101,28 @@ Node *create_input_node(Program *p, FILE *fp) {
   return n;
 }
 
+Node *create_output_node(Program *p, FILE *fp) {
+  Node *n = create_node(p);
+
+  char *line = NULL;
+  line = read_line(fp, line);
+  Node *above = p->nodes_by_index[atoi(line)];
+
+  Instruction *i = node_create_instruction(n, MOV);
+  i->src_type = ADDRESS;
+  i->src.direction = UP;
+  i->dest_type = ADDRESS;
+  i->dest.direction = ACC;
+
+  node_create_instruction(n, OUT);
+
+  n->ports[UP] = above;
+  above->ports[DOWN] = n;
+
+  if (line) { free(line); }
+  return n;
+}
+
 void program_load_system(Program *p, const char *filename) {
   assert(filename);
   FILE *fp = fopen(filename, "r");
@@ -106,8 +132,13 @@ void program_load_system(Program *p, const char *filename) {
 
   char * line = NULL;
   while ((line = read_line(fp, line))) {
+    Node *n = NULL;
     if (strncmp(line, "input-top", 9) == 0) {
-      Node *n = create_input_node(p, fp);
+      n = create_input_node(p, fp);
+    } else if (strncmp(line, "output-bottom", 12) == 0) {
+      n = create_output_node(p, fp);
+    }
+    if (n) {
       p->active_nodes = node_list_append(p->active_nodes, n);
     }
   }

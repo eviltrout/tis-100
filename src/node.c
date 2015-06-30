@@ -12,6 +12,7 @@ void node_init(Node *n) {
   n->acc = 0;
   n->bak = 0;
   n->visible = FALSE;
+  n->blocked = FALSE;
 
   n->instructions = (Instruction *) malloc(sizeof(Instruction) * MAX_INSTRUCTIONS);
 
@@ -201,10 +202,12 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
   ReadResult res;
   res.blocked = 0;
 
+  if (n->output_port) { return res; }
+
   if (type == NUMBER) {
     res.value = where.number;
   } else {
-    Node *dest;
+    Node *read_from;
     switch (where.direction) {
       case NIL:
         res.value = 0;
@@ -216,14 +219,14 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
       case RIGHT:
       case DOWN:
       case LEFT:
-        dest = n->ports[where.direction];
-        if (dest && dest->output_port == n) {
-          res.value = dest->output_value;
+        read_from = n->ports[where.direction];
+        if (read_from && read_from->output_port == n) {
+          res.value = read_from->output_value;
           res.blocked = 0;
 
-          dest->output_value = 0;
-          dest->output_port = NULL;
-          node_advance(dest);
+          read_from->output_value = 0;
+          read_from->output_port = NULL;
+          node_advance(read_from);
         } else {
           res.blocked = 1;
         }
@@ -267,6 +270,8 @@ void node_advance(Node *n) {
 }
 
 void node_tick(Node *n) {
+  n->blocked = TRUE;
+
   Instruction *i = &n->instructions[n->ip];
   short tmp;
   ReadResult read;
@@ -331,10 +336,13 @@ void node_tick(Node *n) {
     case NEG: n->acc = n->acc * -1; break;
     case NOP: break;
     case OUT:
-      printw("[%d] -> %d\n", n->number, n->acc);
+#ifndef RICH_OUTPUT
+      printf("%d\n", n->acc);
+#endif
       break;
     default:
       raise_error("ERROR: DIDN'T HANDLE op\n");
   }
+  n->blocked = FALSE;
   node_advance(n);
 }
