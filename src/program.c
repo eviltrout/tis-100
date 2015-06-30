@@ -1,7 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "constants.h"
 #include "input_code.h"
@@ -9,7 +11,8 @@
 #include "util.h"
 #include "curses.h"
 
-Node *create_node(Program *p) {
+
+static Node *create_node(Program *p) {
   Node *n = (Node *) malloc(sizeof(Node));
   node_init(n);
   p->nodes = node_list_append(p->nodes, n);
@@ -61,7 +64,7 @@ int program_tick(const Program *p) {
   return all_blocked;
 }
 
-char *read_line(FILE *fp, char *line) {
+static char *read_line(FILE *fp, char *line) {
   size_t len = 0;
   ssize_t read = getline(&line, &len, fp);
 
@@ -73,7 +76,7 @@ char *read_line(FILE *fp, char *line) {
 }
 
 
-Node *create_input_node(Program *p, FILE *fp) {
+static Node *create_input_node(Program *p, FILE *fp) {
   Node *n = create_node(p);
 
   char *line = NULL;
@@ -101,7 +104,7 @@ Node *create_input_node(Program *p, FILE *fp) {
   return n;
 }
 
-Node *create_output_node(Program *p, FILE *fp) {
+static Node *create_output_node(Program *p, FILE *fp) {
   Node *n = create_node(p);
 
   char *line = NULL;
