@@ -20,7 +20,7 @@ int main() {
   program_load_system(p, "./programs/divide.sys");
   program_load_code(p, "./programs/divide.tis");
 
-  output_program(win, p);
+  output_program(p);
   /* nodelay(stdscr, TRUE); */
   /* int code = -1; */
   /* while (code != 'q') { */
@@ -32,7 +32,8 @@ int main() {
   while (code != 'q') {
     program_tick(p);
     clear();
-    output_program(win, p);
+    output_program(p);
+    wrefresh(win);
     code = getch();
   }
 
