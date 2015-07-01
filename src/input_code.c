@@ -8,7 +8,7 @@ void input_code_init(InputCode *ic) {
 }
 
 void input_code_addline(InputCode *ic, const char *line) {
-  char *copy = malloc(sizeof(char) * strlen(line));
+  char *copy = malloc(sizeof(char) * (strlen(line) + 1));
   strcpy(copy, line);
   ic->lines[ic->line_count++] = copy;
 }
