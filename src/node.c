@@ -18,6 +18,7 @@ void node_init(Node *n) {
 
   n->output_port = NULL;
   n->output_value = 0;
+  n->last = NULL;
 
   n->ports[0] = NULL;
   n->ports[1] = NULL;
@@ -199,6 +200,43 @@ static inline void node_set_ip(Node *n, short new_val) {
   n->ip = new_val;
 }
 
+static inline Node *node_get_input_port(Node *n, int direction)
+{
+  if (direction == ANY) {
+    LocationDirection dirs[] = {LEFT,RIGHT,UP,DOWN};
+    for(int i=0; i < 4; i++) {
+      Node *port = n->ports[dirs[i]];
+      if (port && port->output_port == n) {
+        return port;
+      }
+    }
+    return NULL;
+  } else if (direction == LAST) {
+    return n->last;
+  } else {
+    return n->ports[direction];
+  }
+}
+
+static inline Node *node_get_output_port(Node *n, int direction)
+{
+  if (direction == ANY) {
+    LocationDirection dirs[] = {UP,LEFT,RIGHT,DOWN};
+    for(int i=0; i < 4; i++) {
+      Node *port = n->ports[dirs[i]];
+      Instruction *inst = &port->instructions[port->ip];
+      if (port && inst->operation == MOV && inst->src_type == ADDRESS && (inst->src.direction == ANY || port->ports[inst->src.direction] == n) ) {
+        return port;
+      }
+    }
+    return NULL;
+  } else if (direction == LAST) {
+    return n->last;
+  } else {
+    return n->ports[direction];
+  }
+}
+
 ReadResult node_read(Node *n, LocationType type, union Location where) {
   ReadResult res;
   res.blocked = 0;
@@ -220,7 +258,9 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
       case RIGHT:
       case DOWN:
       case LEFT:
-        read_from = n->ports[where.direction];
+      case ANY:
+      case LAST:
+        read_from = node_get_input_port(n, where.direction);
         if (read_from && read_from->output_port == n) {
           res.value = read_from->output_value;
           res.blocked = 0;
@@ -228,6 +268,9 @@ ReadResult node_read(Node *n, LocationType type, union Location where) {
           read_from->output_value = 0;
           read_from->output_port = NULL;
           node_advance(read_from);
+          if (where.direction == ANY) n->last = read_from;
+        } else if (read_from == NULL && where.direction == LAST) {
+          res.value = 0;
         } else {
           res.blocked = 1;
         }
@@ -248,14 +291,16 @@ int node_write(Node *n, LocationDirection dir, short value) {
     case RIGHT:
     case DOWN:
     case LEFT:
-      dest = n->ports[dir];
+    case ANY:
+    case LAST:
+      dest = node_get_output_port(n, dir);
       if (dest && n->output_port == NULL) {
         n->output_port = dest;
         n->output_value = value;
+        if (dir == ANY) n->last = dest;
       }
       return 1;
       break;
-    case ANY:
     case NIL:
       raise_error("Can't write to %d", dir);
     default:

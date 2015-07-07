@@ -62,7 +62,7 @@ typedef struct _Node {
   short acc;
   short bak;
 
-  struct _Node *output_port;
+  struct _Node *output_port, *last;
   short output_value;
 
   struct _Node *ports[4];
