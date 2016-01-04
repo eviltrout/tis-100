@@ -10,7 +10,7 @@ which doesn't exist.
 
 ## How to compile
 
-Just run
+Make sure you have `ncurses` installed on your platform.
 
 ```
 $ make
